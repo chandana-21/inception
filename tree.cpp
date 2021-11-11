@@ -279,46 +279,117 @@ TreeNode<int>* nextLargerElement2(TreeNode<int> *root, int n) {
     return nullptr;
 }
 
-TreeNode <int>* secondLargest(TreeNode<int> *root) {
-    /* Given a generic tree, find and return the node with second largest value
-     * in given tree. Return NULL if no node with required value is present. */
-    if(root==nullptr) return nullptr;
-    int childCount = root->children.size();
-    if(childCount==0) return nullptr;
+// TreeNode <int>* secondLargest(TreeNode<int> *root) {
+//     /* Given a generic tree, find and return the node with second largest value
+//      * in given tree. Return NULL if no node with required value is present. */
+//     if(root==nullptr) return nullptr;
+//     int childCount = root->children.size();
+//     if(childCount==0) return nullptr;
 
-    // we have atleast two nodes: root node and one child node
-    TreeNode<int> *largest = root, *secLargest=root->children[0];
-    if(largest->data<secLargest->data)
+//     // we have atleast two nodes: root node and one child node
+//     TreeNode<int> *largest = root, *secLargest=root->children[0];
+//     if(largest->data<secLargest->data)
+//     {
+//         secLargest = root;
+//         largest=root->children[0];
+//     }
+//     queue<TreeNode<int>*> q;
+//     q.push(root);
+//     while(!q.empty())
+//     {
+//         TreeNode<int> *curr = q.front();
+//         q.pop();
+//         childCount = curr->children.size();
+//         for(int i=0; i<childCount; i++)
+//         {
+//             q.push(curr->children[i]);
+//             if(curr->children[i]->data > secLargest->data)
+//             {
+//                 if(curr->children[i]->data > largest->data)
+//                 {
+//                     secLargest = largest;
+//                     largest = curr->children[i];
+//                 }
+//                 else
+//                 {
+//                     secLargest = curr->children[i];
+//                 }
+//             }
+//         }
+//     }
+//     return secLargest;
+// }
+
+
+
+
+
+template<typename Z>
+class SecondLargestReturnType
+{
+public:
+TreeNode<Z> *largest;
+TreeNode<Z> *secondlargest;
+
+SecondLargestReturnType(TreeNode<Z>* first, TreeNode<Z>* second)
+{
+    this -> largest = first;
+    this -> secondlargest = second;
+}
+
+};
+
+SecondLargestReturnType<int>* getSecondLargestNodeHelper(TreeNode<int>* root)
+{
+    if(root == NULL)
+    return new SecondLargestReturnType<int>(NULL,NULL);
+    
+    SecondLargestReturnType<int>* ans = new SecondLargestReturnType<int>(root,NULL);
+
+for(int i = 0; i < root->children.size();i++)
+{
+    SecondLargestReturnType<int>* childAns = getSecondLargestNodeHelper(root->children[i]);
+
+    if(childAns->largest->data > ans->largest->data)
     {
-        secLargest = root;
-        largest=root->children[0];
-    }
-    queue<TreeNode<int>*> q;
-    q.push(root);
-    while(!q.empty())
-    {
-        TreeNode<int> *curr = q.front();
-        q.pop();
-        childCount = curr->children.size();
-        for(int i=0; i<childCount; i++)
+        if(childAns->secondlargest == NULL)
         {
-            q.push(curr->children[i]);
-            if(curr->children[i]->data > secLargest->data)
-            {
-                if(curr->children[i]->data > largest->data)
-                {
-                    secLargest = largest;
-                    largest = curr->children[i];
-                }
-                else
-                {
-                    secLargest = curr->children[i];
-                }
-            }
+            ans->secondlargest = ans->largest;
+            ans->largest = childAns->largest;
+        }
+ else{
+
+        if(childAns->secondlargest->data > ans->largest->data)
+        {
+            ans -> largest = childAns->largest;
+            ans->secondlargest = childAns->secondlargest;
+            
+            
+             } else{
+
+            ans->secondlargest = ans -> largest;
+            ans->largest = childAns->largest;
         }
     }
-    return secLargest;
+} else {
+
+if(ans->largest->data != childAns->largest->data && (ans->secondlargest == NULL || childAns->largest->data > ans->secondlargest->data) )
+{
+    ans->secondlargest = childAns->largest;
 }
+
+}
+}
+return ans;
+}
+
+TreeNode<int>* getSecondLargestNode(TreeNode<int>* root)
+{
+    return getSecondLargestNodeHelper(root)->secondlargest;
+
+
+
+
 
 void replaceWithDepthValueHelper(TreeNode<int> *root, int value){
     /* In a given Generic Tree, replace each node with its depth value. You need
